@@ -6,6 +6,8 @@
 #include "UObject/NoExportTypes.h"
 #include "RadioStationPlaylist.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogRadio, Log, All);
+
 /**
  * Radio station playlist
  */
@@ -18,4 +20,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Radio")
 	static TArray<FString> GetStreams();
+
+protected:
+	UFUNCTION()
+	static void CopyDefaultIniToRoot(const FString& PathToIni);
 };
