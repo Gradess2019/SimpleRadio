@@ -50,14 +50,20 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
 	void Open(const FString& URL);
 
+public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
 	UMediaPlayer* GetMedia();
 
+protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Radio | Stream")
 	void OnRep_CurrentStream();
 
+public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
 	void Play(const FString& URL);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	UObject* GetRadioReplicator();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
 	void PlayById(const int Id);
@@ -68,9 +74,27 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
 	void PlayPrevious();
 
+protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Stream")
 	void Lock();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Stream")
 	void Unlock();
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	void AdjustVolume(const float Delta);
+
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	float CalculateNewVolume(const float Delta);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Radio | Stream")
+	void OnRep_Volume();
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	void SetVolume(const float NewVolume);
+
+	virtual void GetLifetimeReplicatedProps(::TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

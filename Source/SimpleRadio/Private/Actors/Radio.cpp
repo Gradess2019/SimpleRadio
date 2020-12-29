@@ -6,7 +6,9 @@
 #include "MediaPlayer.h"
 #include "Interfaces/RadioReplicator.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetArrayLibrary.h"
+#include "Libraries/RadioHelper.h"
+#include "Net/UnrealNetwork.h"
 
 ARadio::ARadio()
 {
@@ -51,7 +53,7 @@ void ARadio::Play_Implementation(const FString& URL)
 		CurrentStream = URL;
 		Lock();
 
-		#if UE_SERVER
+#if UE_SERVER
 		UE_LOG(LogTemp, Warning, TEXT("Dedicated server"));
 		FTimerHandle UnlockTimer;
 		GetWorldTimerManager().SetTimer(
@@ -60,13 +62,96 @@ void ARadio::Play_Implementation(const FString& URL)
 			&ARadio::Unlock,
 			2.f
 		);
-		#endif
+#endif
+	}
+	else
+	{
+		const auto RadioReplicator = GetRadioReplicator();
+		if (!IsValid(RadioReplicator)) { return; }
+
+		IRadioReplicator::Execute_Play(RadioReplicator, URL);
+	}
+}
+
+void ARadio::Lock_Implementation()
+{
+	bLock = true;
+}
+
+void ARadio::Unlock_Implementation()
+{
+	bLock = false;
+}
+
+UObject* ARadio::GetRadioReplicator_Implementation()
+{
+	const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	const auto bImplements = PlayerController->Implements<URadioReplicator>();
+	return bImplements ? PlayerController : nullptr;
+}
+
+void ARadio::PlayNext_Implementation()
+{
+	const auto CurrentStreamId = Streams.Find(CurrentStream);
+	const auto NextStreamId = (CurrentStreamId + 1) % Streams.Num();
+
+	PlayById(NextStreamId);
+}
+
+void ARadio::PlayById_Implementation(const int Id)
+{
+	const auto bValidIndex = Streams.IsValidIndex(Id);
+	if (!bValidIndex) { return; }
+
+	const auto NewStream = Streams[Id];
+	Play(NewStream);
+}
+
+void ARadio::PlayPrevious_Implementation()
+{
+	const auto CurrentStreamId = Streams.Find(CurrentStream);
+	const auto PreviousStreamId = CurrentStreamId - 1 < 0 ? Streams.Num() - 1 : CurrentStreamId - 1;
+
+	PlayById(PreviousStreamId);
+}
+
+void ARadio::AdjustVolume_Implementation(const float Delta)
+{
+	const auto bServer = HasAuthority();
+	if (bServer)
+	{
+		Volume = CalculateNewVolume(Delta);
 	} else
 	{
-		const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-		const auto bImplements = PlayerController->Implements<URadioReplicator>();
-		if (!bImplements) { return; }
+		const auto RadioReplicator = GetRadioReplicator();
+		if (!IsValid(RadioReplicator)) { return; }
 
-		IRadioReplicator::Execute_Play(PlayerController, URL);
+		IRadioReplicator::Execute_AdjustVolume(RadioReplicator, Delta);
 	}
+}
+
+float ARadio::CalculateNewVolume_Implementation(const float Delta)
+{
+	const auto CurrentVolume = URadioHelper::GetMediaVolume(MediaSoundComponent);
+	const auto NewVolume = FMath::Clamp(CurrentVolume + Delta, MinVolume, MaxVolume);
+	return NewVolume;
+}
+
+void ARadio::OnRep_Volume_Implementation()
+{
+	SetVolume(Volume);
+}
+
+void ARadio::SetVolume_Implementation(const float NewVolume)
+{
+	URadioHelper::SetMediaVolume(MediaSoundComponent, NewVolume);
+}
+
+void ARadio::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARadio, CurrentStream);
+	DOREPLIFETIME(ARadio, Volume);
+	DOREPLIFETIME_CONDITION(ARadio, Streams, COND_InitialOnly);
 }
