@@ -50,11 +50,11 @@ void ARadio::BeginPlay()
 void ARadio::BindUnlockFunction_Implementation()
 {
 	FScriptDelegate UnlockDelegate;
-	UnlockDelegate.BindUFunction(this, "Play");
+	UnlockDelegate.BindUFunction(this, "Unlock");
 
-	// auto MediaPlayer = GetMedia();
-	// MediaPlayer->OnMediaOpened.Add(UnlockDelegate);
-	// MediaPlayer->OnMediaOpenFailed.AddDynamic(UnlockDelegate);
+	auto MediaPlayer = GetMedia();
+	MediaPlayer->OnMediaOpened.Add(UnlockDelegate);
+	MediaPlayer->OnMediaOpenFailed.Add(UnlockDelegate);
 }
 
 void ARadio::SetupStreams_Implementation()
