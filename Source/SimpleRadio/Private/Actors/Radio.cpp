@@ -6,7 +6,6 @@
 #include "MediaPlayer.h"
 #include "Interfaces/RadioReplicator.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetArrayLibrary.h"
 #include "Libraries/RadioHelper.h"
 #include "Net/UnrealNetwork.h"
 
@@ -14,16 +13,62 @@ ARadio::ARadio()
 {
 	MediaSoundComponent = CreateDefaultSubobject<UMediaSoundComponent>(FName("MediaSound"));
 	MediaSoundComponent->SetupAttachment(GetRootComponent());
+
+	const auto MediaPlayerPath = TEXT("MediaPlayer'/SimpleRadio/Media/MP_Radio.MP_Radio'");
+	static ConstructorHelpers::FObjectFinder<UMediaPlayer> MediaPlayerAsset(MediaPlayerPath);
+	const auto MediaPlayer = MediaPlayerAsset.Object;
+	MediaSoundComponent->SetDefaultMediaPlayer(MediaPlayer);
+
+	MediaSoundComponent->bAllowSpatialization = true;
+
+	const auto AttenuationPath = TEXT("SoundAttenuation'/SimpleRadio/Sound/ATT_Radio.ATT_Radio'");
+	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationAsset(AttenuationPath);
+	const auto Attenuation = AttenuationAsset.Object;
+	MediaSoundComponent->AttenuationSettings = Attenuation;
+
+	MinVolume = 0.f;
+	MaxVolume = 1.f;
+
+	bAutoPlay = true;
+
+	bStaticMeshReplicateMovement = true;
+	bReplicates = true;
 }
 
 void ARadio::BeginPlay()
 {
 	Super::BeginPlay();
+
+	const auto bServer = HasAuthority();
+	if (!bServer) { return; }
+
+	BindUnlockFunction();
+	SetupStreams();
+	SetupVolume();
+}
+
+void ARadio::BindUnlockFunction_Implementation()
+{
+	FScriptDelegate UnlockDelegate;
+	UnlockDelegate.BindUFunction(this, "Play");
+
+	// auto MediaPlayer = GetMedia();
+	// MediaPlayer->OnMediaOpened.Add(UnlockDelegate);
+	// MediaPlayer->OnMediaOpenFailed.AddDynamic(UnlockDelegate);
 }
 
 void ARadio::SetupStreams_Implementation()
 {
 	Streams = URadioStationPlaylist::GetStreams();
+
+	if (!bAutoPlay) { return; }
+
+	PlayById(0);
+}
+
+void ARadio::SetupVolume_Implementation()
+{
+	Volume = URadioHelper::GetMediaVolume(MediaSoundComponent);
 }
 
 void ARadio::Open_Implementation(const FString& URL)
@@ -48,9 +93,13 @@ void ARadio::Play_Implementation(const FString& URL)
 	const auto bAuthority = HasAuthority();
 	if (bAuthority)
 	{
-		if (!bLock) { return; }
+		if (bLock) { return; }
 
 		CurrentStream = URL;
+
+#if !UE_SERVER
+		OnRep_CurrentStream();
+#endif
 		Lock();
 
 #if UE_SERVER
@@ -121,7 +170,9 @@ void ARadio::AdjustVolume_Implementation(const float Delta)
 	if (bServer)
 	{
 		Volume = CalculateNewVolume(Delta);
-	} else
+		OnRep_Volume();
+	}
+	else
 	{
 		const auto RadioReplicator = GetRadioReplicator();
 		if (!IsValid(RadioReplicator)) { return; }

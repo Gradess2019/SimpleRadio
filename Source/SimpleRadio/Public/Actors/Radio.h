@@ -18,10 +18,10 @@ public:
 	ARadio();
 
 protected:
-	UPROPERTY(BlueprintReadWrite, Category = "Radio")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Radio")
 	UMediaSoundComponent* MediaSoundComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Radio")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Radio")
 	bool bAutoPlay;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Radio | Stream")
@@ -33,7 +33,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Radio | Stream")
 	TArray<FString> Streams;
 
-	UPROPERTY(BlueprintReadWrite, Replicated, Category = "Radio | Volume")
+	UPROPERTY(BlueprintReadWrite, ReplicatedUsing=OnRep_Volume, Category = "Radio | Volume")
 	float Volume;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Radio | Volume")
@@ -45,7 +45,13 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Stream")
+	void BindUnlockFunction();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Stream")
 	void SetupStreams();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Stream")
+	void SetupVolume();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
 	void Open(const FString& URL);
