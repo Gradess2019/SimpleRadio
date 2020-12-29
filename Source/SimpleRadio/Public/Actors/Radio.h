@@ -60,34 +60,32 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
 	UMediaPlayer* GetMedia();
 
-protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "Radio | Stream")
-	void OnRep_CurrentStream();
-
-public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
 	void Play(const FString& URL);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
-	UObject* GetRadioReplicator();
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
-	void PlayById(const int Id);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
-	void PlayNext();
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
-	void PlayPrevious();
 
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Stream")
 	void Lock();
 
+	UFUNCTION(BlueprintNativeEvent, Category = "Radio | Stream")
+	void OnRep_CurrentStream();
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Stream")
 	void Unlock();
 
 public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	UObject* GetRadioReplicator();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	void PlayNext();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	void PlayById(const int Id);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	void PlayPrevious();
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
 	void AdjustVolume(const float Delta = 0.05f);
 

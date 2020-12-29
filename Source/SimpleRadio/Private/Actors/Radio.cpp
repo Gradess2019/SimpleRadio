@@ -83,11 +83,6 @@ UMediaPlayer* ARadio::GetMedia_Implementation()
 	return MediaSoundComponent->GetMediaPlayer();
 }
 
-void ARadio::OnRep_CurrentStream_Implementation()
-{
-	Open(CurrentStream);
-}
-
 void ARadio::Play_Implementation(const FString& URL)
 {
 	const auto bAuthority = HasAuthority();
@@ -125,6 +120,11 @@ void ARadio::Play_Implementation(const FString& URL)
 void ARadio::Lock_Implementation()
 {
 	bLock = true;
+}
+
+void ARadio::OnRep_CurrentStream_Implementation()
+{
+	Open(CurrentStream);
 }
 
 void ARadio::Unlock_Implementation()
