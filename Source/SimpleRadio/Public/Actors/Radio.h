@@ -89,7 +89,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
-	void AdjustVolume(const float Delta);
+	void AdjustVolume(const float Delta = 0.05f);
 
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")

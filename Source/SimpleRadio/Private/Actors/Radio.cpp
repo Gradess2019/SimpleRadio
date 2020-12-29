@@ -118,7 +118,7 @@ void ARadio::Play_Implementation(const FString& URL)
 		const auto RadioReplicator = GetRadioReplicator();
 		if (!IsValid(RadioReplicator)) { return; }
 
-		IRadioReplicator::Execute_Play(RadioReplicator, URL);
+		IRadioReplicator::Execute_Play(RadioReplicator, this, URL);
 	}
 }
 
@@ -177,7 +177,7 @@ void ARadio::AdjustVolume_Implementation(const float Delta)
 		const auto RadioReplicator = GetRadioReplicator();
 		if (!IsValid(RadioReplicator)) { return; }
 
-		IRadioReplicator::Execute_AdjustVolume(RadioReplicator, Delta);
+		IRadioReplicator::Execute_AdjustVolume(RadioReplicator, this, Delta);
 	}
 }
 
