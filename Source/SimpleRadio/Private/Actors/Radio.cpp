@@ -7,17 +7,22 @@
 #include "Interfaces/RadioReplicator.h"
 #include "Kismet/GameplayStatics.h"
 #include "Libraries/RadioHelper.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Net/UnrealNetwork.h"
 
 ARadio::ARadio()
 {
 	MediaSoundComponent = CreateDefaultSubobject<UMediaSoundComponent>(FName("MediaSound"));
-	MediaSoundComponent->SetupAttachment(GetRootComponent());
+	MediaSoundComponent->SetupAttachment(RootComponent);
 
 	const auto MediaPlayerPath = TEXT("MediaPlayer'/SimpleRadio/Media/MP_Radio.MP_Radio'");
 	static ConstructorHelpers::FObjectFinder<UMediaPlayer> MediaPlayerAsset(MediaPlayerPath);
 	const auto MediaPlayer = MediaPlayerAsset.Object;
+#if WITH_EDITOR
 	MediaSoundComponent->SetDefaultMediaPlayer(MediaPlayer);
+#else
+	MediaSoundComponent->SetMediaPlayer(MediaPlayer);
+#endif
 
 	MediaSoundComponent->bAllowSpatialization = true;
 
@@ -94,8 +99,7 @@ void ARadio::Play_Implementation(const FString& URL)
 	const auto bAuthority = HasAuthority();
 	if (bAuthority)
 	{
-		if (bLock) { return; }
-		// FIXME Add checking current stream with new URL
+		if (bLock || CurrentStream.Equals(URL, ESearchCase::IgnoreCase)) { return; }
 
 		CurrentStream = URL;
 
