@@ -68,7 +68,13 @@ void ARadio::SetupStreams_Implementation()
 
 void ARadio::SetupVolume_Implementation()
 {
-	Volume = URadioHelper::GetMediaVolume(MediaSoundComponent);
+	const auto InitialVolume = URadioHelper::GetMediaVolume(MediaSoundComponent);
+	SetVolume(InitialVolume);
+}
+
+void ARadio::SetVolume_Implementation(const float NewVolume)
+{
+	Volume = NewVolume;
 }
 
 void ARadio::Open_Implementation(const FString& URL)
@@ -170,7 +176,8 @@ void ARadio::AdjustVolume_Implementation(const float Delta)
 	const auto bServer = HasAuthority();
 	if (bServer)
 	{
-		Volume = CalculateNewVolume(Delta);
+		const float NewVolume = CalculateNewVolume(Delta);
+		SetVolume(NewVolume);
 		OnRep_Volume();
 	}
 	else

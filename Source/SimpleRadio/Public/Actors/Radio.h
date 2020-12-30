@@ -61,8 +61,12 @@ protected:
 	void SetupStreams();
 
 	/** Sets initial volume */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Stream")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Volume")
 	void SetupVolume();
+
+	/** Sets volume */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Volume")
+	void SetVolume(const float Volume);
 
 	/** Opens stream URL */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
@@ -70,7 +74,7 @@ protected:
 
 public:
 	/** Returns current Media Player */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio")
 	UMediaPlayer* GetMedia();
 
 	/** Play new stream */
@@ -91,7 +95,7 @@ protected:
 
 public:
 	/** Returns object that is in charge of radio replication (used for calling RPCs) */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio")
 	UObject* GetRadioReplicator();
 
 	/** Plays next stream */
@@ -107,20 +111,19 @@ public:
 	void PlayPrevious();
 
 	/** Decreases or increases volume of radio */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Volume")
 	void AdjustVolume(const float Delta = 0.05f);
 
 protected:
 	/** Calculates new volume */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Volume")
 	float CalculateNewVolume(const float Delta);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Radio | Stream")
+	UFUNCTION(BlueprintNativeEvent, Category = "Radio | Volume")
 	void OnRep_Volume();
 
-public:
-	/** Set volume of media sound component. Doesn't replicate Volume variable  */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
+	/** Set volume of media sound component. Doesn't replicate Volume variable, use SetVolume() instead.  */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Volume")
 	void SetVolumeInternal(const float NewVolume);
 
 	virtual void GetLifetimeReplicatedProps(::TArray<FLifetimeProperty>& OutLifetimeProps) const override;
