@@ -9,7 +9,7 @@
 class UMediaSoundComponent;
 class UMediaPlayer;
 
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class SIMPLERADIO_API ARadio : public AStaticMeshActor
 {
 	GENERATED_BODY()
