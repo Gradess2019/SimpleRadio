@@ -64,10 +64,12 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Volume")
 	void SetupVolume();
 
+public:
 	/** Sets volume */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintAuthorityOnly, Category = "Radio | Volume")
-	void SetVolume(const float Volume);
+	void SetVolume(const float NewVolume);
 
+protected:
 	/** Opens stream URL */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio | Stream")
 	void Open(const FString& URL);

@@ -201,7 +201,7 @@ void ARadio::OnRep_Volume_Implementation()
 	SetVolumeInternal(Volume);
 }
 
-void ARadio::SetVolume_Implementation(const float NewVolume)
+void ARadio::SetVolumeInternal_Implementation(const float NewVolume)
 {
 	URadioHelper::SetMediaVolume(MediaSoundComponent, NewVolume);
 }
