@@ -89,6 +89,7 @@ void ARadio::Play_Implementation(const FString& URL)
 	if (bAuthority)
 	{
 		if (bLock) { return; }
+		// FIXME Add checking current stream with new URL
 
 		CurrentStream = URL;
 
@@ -190,7 +191,7 @@ float ARadio::CalculateNewVolume_Implementation(const float Delta)
 
 void ARadio::OnRep_Volume_Implementation()
 {
-	SetVolume(Volume);
+	SetVolumeInternal(Volume);
 }
 
 void ARadio::SetVolume_Implementation(const float NewVolume)
