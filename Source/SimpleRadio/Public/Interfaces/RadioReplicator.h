@@ -22,8 +22,8 @@ class SIMPLERADIO_API IRadioReplicator
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio Replicator")
-	void AdjustVolume(const float Delta);
+	void AdjustVolume(ARadio* Radio, const float Delta);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Radio Replicator")
-    void Play(const FString& URL);
+    void Play(ARadio* Radio, const FString& URL);
 };
