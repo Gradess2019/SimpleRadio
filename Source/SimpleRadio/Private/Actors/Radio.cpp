@@ -99,8 +99,7 @@ void ARadio::Play_Implementation(const FString& URL)
 	const auto bAuthority = HasAuthority();
 	if (bAuthority)
 	{
-		if (bLock) { return; }
-		// FIXME Add checking current stream with new URL
+		if (bLock || CurrentStream.Equals(URL, ESearchCase::IgnoreCase)) { return; }
 
 		CurrentStream = URL;
 
